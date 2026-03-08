@@ -104,7 +104,7 @@ app.use((err, req, res, next) => {
     ip: req.ip || req.connection.remoteAddress,
     statusCode: err.status || 500
   });
-  
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error',
@@ -113,7 +113,7 @@ app.use((err, req, res, next) => {
 });
 
 // Database connection and server start
-const PORT = process.env.PORT || 5000;
+const PORT = 5001;
 
 const startServer = async () => {
   try {
