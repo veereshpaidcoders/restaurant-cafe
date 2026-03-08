@@ -73,8 +73,8 @@ npm run client
 
 ### Access Points
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **API Documentation**: http://localhost:5000/api/docs
+- **Backend API**: http://localhost:5001
+- **API Documentation**: http://localhost:5001/api/docs
 
 ### Default Admin Login
 - Email: admin@restaurant.com
