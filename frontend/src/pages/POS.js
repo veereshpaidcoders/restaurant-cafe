@@ -8,6 +8,7 @@ const POS = () => {
   const [cart, setCart] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
+  const [selectedSection, setSelectedSection] = useState('lodge-dine'); // New state for section
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     phone: '',
@@ -42,8 +43,8 @@ const POS = () => {
   const addToCart = (item) => {
     const existingItem = cart.find(i => i.menuItemId === item.id);
     if (existingItem) {
-      setCart(cart.map(i => 
-        i.menuItemId === item.id 
+      setCart(cart.map(i =>
+        i.menuItemId === item.id
           ? { ...i, quantity: i.quantity + 1 }
           : i
       ));
@@ -58,8 +59,8 @@ const POS = () => {
   };
 
   const updateQuantity = (menuItemId, delta) => {
-    setCart(cart.map(item => 
-      item.menuItemId === menuItemId 
+    setCart(cart.map(item =>
+      item.menuItemId === menuItemId
         ? { ...item, quantity: Math.max(0, item.quantity + delta) }
         : item
     ).filter(item => item.quantity > 0));
@@ -84,6 +85,7 @@ const POS = () => {
     try {
       const orderData = {
         orderType,
+        section: selectedSection, // Include section in order
         tableNumber: orderType === 'dine-in' ? tableNumber : null,
         customerName: customerInfo.name,
         customerPhone: customerInfo.phone,
@@ -93,7 +95,7 @@ const POS = () => {
       };
 
       await api.post('/orders', orderData);
-      toast.success('Order created successfully!');
+      toast.success(`Order created successfully for ${selectedSection === 'lodge-dine' ? 'Lodge-Dine' : 'Cafe-Restaurant'}!`);
       setCart([]);
       setCustomerInfo({ name: '', phone: '', email: '' });
       setTableNumber('');
@@ -103,57 +105,90 @@ const POS = () => {
   };
 
   const { subtotal, tax, total } = calculateTotal();
-  const filteredItems = selectedCategory === 'all' 
-    ? menuItems 
+  const filteredItems = selectedCategory === 'all'
+    ? menuItems
     : menuItems.filter(item => item.category === selectedCategory);
 
   return (
     <div className="h-[calc(100vh-200px)]">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Point of Sale</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Point of Sale</h1>
+
+        {/* Section Toggle */}
+        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => setSelectedSection('lodge-dine')}
+            className={`px-6 py-2 rounded-md font-semibold transition-all ${selectedSection === 'lodge-dine'
+                ? 'bg-white text-primary-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            Lodge-Dine
+          </button>
+          <button
+            onClick={() => setSelectedSection('cafe-restaurant')}
+            className={`px-6 py-2 rounded-md font-semibold transition-all ${selectedSection === 'cafe-restaurant'
+                ? 'bg-white text-primary-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            Cafe-Restaurant
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
         {/* Menu Items */}
         <div className="lg:col-span-2 bg-white rounded-lg shadow p-6 overflow-y-auto">
+          {/* Section Badge */}
+          <div className="mb-4 inline-block">
+            <span className={`px-4 py-1 rounded-full text-sm font-semibold ${selectedSection === 'lodge-dine'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-green-100 text-green-800'
+              }`}>
+              {selectedSection === 'lodge-dine' ? '🏨 Lodge-Dine Section' : '☕ Cafe-Restaurant Section'}
+            </span>
+          </div>
+
           {/* Category Filter */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
             {categories.map(category => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
-                  selectedCategory === category
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${selectedCategory === category
                     ? 'bg-primary-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </button>
             ))}
           </div>
 
-          {/* Menu Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {/* Menu Grid - Without Images */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredItems.map(item => (
               <div
                 key={item.id}
                 onClick={() => addToCart(item)}
-                className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+                className="border-2 rounded-lg p-4 cursor-pointer hover:shadow-lg hover:border-primary-500 transition-all bg-gradient-to-br from-white to-gray-50"
               >
-                <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden">
-                  {item.image ? (
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      No image
-                    </div>
+                <div className="flex flex-col items-center justify-center py-4">
+                  {/* Icon based on category */}
+                  <div className="text-4xl mb-2">
+                    {item.category === 'beverages' ? '☕' :
+                      item.category === 'appetizers' ? '🍽️' :
+                        item.category === 'main-course' ? '🍛' :
+                          item.category === 'desserts' ? '🍰' :
+                            item.category === 'snacks' ? '🥪' : '🍴'}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-center mb-1">{item.name}</h3>
+                  <p className="text-lg font-bold text-primary-600">₹{parseFloat(item.price).toFixed(2)}</p>
+                  {item.category && (
+                    <p className="text-xs text-gray-500 mt-1 capitalize">{item.category}</p>
                   )}
                 </div>
-                <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">₹{parseFloat(item.price).toFixed(2)}</p>
               </div>
             ))}
           </div>
@@ -161,7 +196,15 @@ const POS = () => {
 
         {/* Cart */}
         <div className="bg-white rounded-lg shadow p-6 flex flex-col">
-          <h2 className="text-xl font-semibold mb-4">Current Order</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Current Order</h2>
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedSection === 'lodge-dine'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-green-100 text-green-800'
+              }`}>
+              {selectedSection === 'lodge-dine' ? 'Lodge-Dine' : 'Cafe-Restaurant'}
+            </span>
+          </div>
 
           {/* Order Type */}
           <div className="mb-4">

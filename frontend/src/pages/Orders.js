@@ -6,15 +6,14 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-
-  useEffect(() => {
-    fetchOrders();
-  }, [filter]);
+  const [sectionFilter, setSectionFilter] = useState('all');
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const params = filter !== 'all' ? { status: filter } : {};
+      const params = {};
+      if (filter !== 'all') params.status = filter;
+      if (sectionFilter !== 'all') params.section = sectionFilter;
       const { data } = await api.get('/orders', { params });
       setOrders(data.data);
     } catch (error) {
@@ -23,6 +22,11 @@ const Orders = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, sectionFilter]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
@@ -55,7 +59,16 @@ const Orders = () => {
     <div>
       <div className="sm:flex sm:items-center sm:justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-        <div className="mt-4 sm:mt-0">
+        <div className="mt-4 sm:mt-0 flex gap-3">
+          <select
+            value={sectionFilter}
+            onChange={(e) => setSectionFilter(e.target.value)}
+            className="border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="all">All Sections</option>
+            <option value="lodge-dine">🏨 Lodge-Dine</option>
+            <option value="cafe-restaurant">☕ Cafe-Restaurant</option>
+          </select>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -94,11 +107,26 @@ const Orders = () => {
                     <div className="mt-2 sm:flex sm:justify-between">
                       <div className="sm:flex sm:space-x-4">
                         <p className="flex items-center text-sm text-gray-500">
-                          {order.orderType} • {order.customerName}
+                          {order.orderType}
                         </p>
+                        {order.section && (
+                          <p className="mt-2 flex items-center text-sm sm:mt-0">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${order.section === 'lodge-dine'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-green-100 text-green-800'
+                              }`}>
+                              {order.section === 'lodge-dine' ? '🏨 Lodge-Dine' : '☕ Cafe-Restaurant'}
+                            </span>
+                          </p>
+                        )}
                         {order.tableNumber && (
                           <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                            Table: {order.tableNumber}
+                            <span className="font-medium text-gray-700">Table:</span>&nbsp;{order.tableNumber}
+                          </p>
+                        )}
+                        {order.customerName && (
+                          <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            <span className="font-medium text-gray-700">Customer:</span>&nbsp;{order.customerName}
                           </p>
                         )}
                       </div>
