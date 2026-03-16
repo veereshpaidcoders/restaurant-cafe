@@ -1,7 +1,7 @@
 {
-  "name": "cafe-delicacy",
+  "name": "rk-ellite",
   "version": "1.0.0",
-  "description": "Cafe Delicacy - Professional Restaurant Management System",
+  "description": "RK Ellite - Professional Restaurant Management System",
   "main": "server.js",
   "scripts": {
     "start": "node backend/server.js",

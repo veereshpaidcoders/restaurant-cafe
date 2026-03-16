@@ -1,7 +1,7 @@
 # Lodge Management System Documentation
 
 ## Overview
-A professional and comprehensive lodge management system has been integrated into the Cafe Delicacy application, providing complete room management and booking capabilities.
+A professional and comprehensive lodge management system has been integrated into the RK Ellite application, providing complete room management and booking capabilities.
 
 ---
 

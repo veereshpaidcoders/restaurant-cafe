@@ -11,7 +11,7 @@ const logger = require('./utils/logger');
 // Load environment variables
 dotenv.config();
 
-logger.info('Starting Cafe Delicacy Management System...', {
+logger.info('Starting RK Ellite Management System...', {
   nodeVersion: process.version,
   environment: process.env.NODE_ENV || 'development'
 });

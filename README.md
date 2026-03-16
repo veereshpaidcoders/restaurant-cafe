@@ -1,4 +1,4 @@
-# Cafe Delicacy - Restaurant Management System
+# RK Ellite - Restaurant Management System
 
 A comprehensive, professional restaurant management software with complete features for modern restaurant operations.
 

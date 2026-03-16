@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 🚀 EC2 Deployment Script for Cafe Delicacy Restaurant
+# 🚀 EC2 Deployment Script for RK Ellite Restaurant
 # This script will deploy your application to EC2 with Docker, Nginx, and SSL
 
 set -e  # Exit on error
 
 # Configuration
-EC2_IP="13.232.173.130"
+EC2_IP="13.233.0.43"
 EC2_USER="ec2-user"
 SSH_KEY="/Users/veershettydagade/Documents/restaurant-proj/restaurant-cafe/cafe.pem"
 DOMAIN="cafe-delicacy-restaurant.com"

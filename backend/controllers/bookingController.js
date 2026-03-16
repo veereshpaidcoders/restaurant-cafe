@@ -46,7 +46,7 @@ exports.getBookings = async (req, res) => {
                 {
                     model: Customer,
                     as: 'customer',
-                    attributes: ['id', 'name', 'email', 'phone']
+                    attributes: ['id', 'firstName', 'lastName', 'email', 'phone']
                 },
                 {
                     model: User,

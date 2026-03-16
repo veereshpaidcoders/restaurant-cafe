@@ -28,7 +28,7 @@ const Login = () => {
             </div>
           </div>
           <h2 className="mt-6 text-center text-4xl font-extrabold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-            Cafe Delicacy
+            RK Ellite
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Sign in to your account
