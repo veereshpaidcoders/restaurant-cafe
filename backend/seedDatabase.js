@@ -63,9 +63,33 @@ const seedData = async () => {
         role: 'chef',
         phone: '+1234567894',
         department: 'Kitchen'
+      },
+      {
+        firstName: 'Captain',
+        lastName: 'One',
+        email: 'captain1@restaurant.com',
+        password: 'Captain1!2024@cafe',
+        role: 'captain',
+        section: 'lodge-dine',
+        phone: '+1234567895',
+        department: 'Lodge-Dine Section',
+        isActive: true,
+        hireDate: new Date()
+      },
+      {
+        firstName: 'Captain',
+        lastName: 'Two',
+        email: 'captain2@restaurant.com',
+        password: 'Captain2!2024@cafe',
+        role: 'captain',
+        section: 'cafe-restaurant',
+        phone: '+1234567896',
+        department: 'Cafe-Restaurant Section',
+        isActive: true,
+        hireDate: new Date()
       }
-    ]);
-    console.log('✓ Sample staff created');
+    ], { individualHooks: true });
+    console.log('✓ Sample staff created (including 2 captains with section access)');
 
     // Create menu items - Indian Vegetarian
     await MenuItem.bulkCreate([
@@ -122,20 +146,33 @@ const seedData = async () => {
     ]);
     console.log('✓ Inventory items created');
 
-    // Create tables
+    // Create tables for both sections - 10 tables per section (20 total)
     await Table.bulkCreate([
-      { tableNumber: '1', seats: 2, status: 'available', location: 'Main Hall' },
-      { tableNumber: '2', seats: 2, status: 'available', location: 'Main Hall' },
-      { tableNumber: '3', seats: 4, status: 'available', location: 'Main Hall' },
-      { tableNumber: '4', seats: 4, status: 'available', location: 'Main Hall' },
-      { tableNumber: '5', seats: 6, status: 'available', location: 'Main Hall' },
-      { tableNumber: '6', seats: 6, status: 'available', location: 'Main Hall' },
-      { tableNumber: '7', seats: 8, status: 'available', location: 'Private Room' },
-      { tableNumber: '8', seats: 4, status: 'available', location: 'Patio' },
-      { tableNumber: '9', seats: 4, status: 'available', location: 'Patio' },
-      { tableNumber: '10', seats: 2, status: 'available', location: 'Bar Area' }
+      // Lodge-Dine Section Tables (10 tables)
+      { tableNumber: 'LD-01', section: 'lodge-dine', seats: 2, status: 'available', location: 'Main Hall' },
+      { tableNumber: 'LD-02', section: 'lodge-dine', seats: 2, status: 'available', location: 'Main Hall' },
+      { tableNumber: 'LD-03', section: 'lodge-dine', seats: 4, status: 'available', location: 'Main Hall' },
+      { tableNumber: 'LD-04', section: 'lodge-dine', seats: 4, status: 'available', location: 'Main Hall' },
+      { tableNumber: 'LD-05', section: 'lodge-dine', seats: 4, status: 'available', location: 'Window Side' },
+      { tableNumber: 'LD-06', section: 'lodge-dine', seats: 6, status: 'available', location: 'Window Side' },
+      { tableNumber: 'LD-07', section: 'lodge-dine', seats: 6, status: 'available', location: 'Corner' },
+      { tableNumber: 'LD-08', section: 'lodge-dine', seats: 8, status: 'available', location: 'Private Room' },
+      { tableNumber: 'LD-09', section: 'lodge-dine', seats: 4, status: 'available', location: 'Center' },
+      { tableNumber: 'LD-10', section: 'lodge-dine', seats: 2, status: 'available', location: 'Bar Area' },
+
+      // Cafe-Restaurant Section Tables (10 tables)
+      { tableNumber: 'CR-01', section: 'cafe-restaurant', seats: 2, status: 'available', location: 'Patio' },
+      { tableNumber: 'CR-02', section: 'cafe-restaurant', seats: 2, status: 'available', location: 'Patio' },
+      { tableNumber: 'CR-03', section: 'cafe-restaurant', seats: 4, status: 'available', location: 'Patio' },
+      { tableNumber: 'CR-04', section: 'cafe-restaurant', seats: 4, status: 'available', location: 'Garden View' },
+      { tableNumber: 'CR-05', section: 'cafe-restaurant', seats: 4, status: 'available', location: 'Garden View' },
+      { tableNumber: 'CR-06', section: 'cafe-restaurant', seats: 6, status: 'available', location: 'Indoor' },
+      { tableNumber: 'CR-07', section: 'cafe-restaurant', seats: 6, status: 'available', location: 'Indoor' },
+      { tableNumber: 'CR-08', section: 'cafe-restaurant', seats: 8, status: 'available', location: 'Banquet Hall' },
+      { tableNumber: 'CR-09', section: 'cafe-restaurant', seats: 2, status: 'available', location: 'Bar Counter' },
+      { tableNumber: 'CR-10', section: 'cafe-restaurant', seats: 4, status: 'available', location: 'Terrace' }
     ]);
-    console.log('✓ Tables created');
+    console.log('✓ 20 Tables created (10 per section) with section isolation');
 
     // Create sample customers
     await Customer.bulkCreate([

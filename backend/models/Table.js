@@ -9,12 +9,16 @@ const Table = sequelize.define('Table', {
   },
   tableNumber: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+    allowNull: false
+  },
+  section: {
+    type: DataTypes.ENUM('lodge-dine', 'cafe-restaurant'),
+    allowNull: false
   },
   seats: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    defaultValue: 4
   },
   status: {
     type: DataTypes.ENUM('available', 'occupied', 'reserved', 'cleaning'),
@@ -26,12 +30,22 @@ const Table = sequelize.define('Table', {
   qrCode: {
     type: DataTypes.TEXT
   },
+  currentOrderId: {
+    type: DataTypes.UUID,
+    allowNull: true
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ['tableNumber', 'section']
+    }
+  ]
 });
 
 module.exports = Table;

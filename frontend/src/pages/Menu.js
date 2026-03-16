@@ -10,10 +10,12 @@ const Menu = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedSection, setSelectedSection] = useState('all'); // New state for section filter
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: '',
+    section: 'both',
     price: '',
     cost: '',
     isAvailable: true
@@ -21,12 +23,20 @@ const Menu = () => {
 
   // Predefined categories
   const categories = [
+    'Breakfast',
     'Beverages',
     'Main Course',
     'Appetizers',
     'Desserts',
     'Snacks',
     'Starters'
+  ];
+
+  // Predefined sections
+  const sections = [
+    { value: 'both', label: 'Both (Lodge-Dine & Cafe-Restaurant)' },
+    { value: 'lodge-dine', label: 'Lodge-Dine Only' },
+    { value: 'cafe-restaurant', label: 'Cafe-Restaurant Only' }
   ];
 
   useEffect(() => {
@@ -47,20 +57,28 @@ const Menu = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/menu', formData);
+      const payload = {
+        ...formData,
+        price: parseFloat(formData.price) || 0,
+        cost: formData.cost ? parseFloat(formData.cost) : null
+      };
+      await api.post('/menu', payload);
       toast.success('Menu item added successfully');
       setShowAddModal(false);
       setFormData({
         name: '',
         description: '',
         category: '',
+        section: 'both',
         price: '',
         cost: '',
         isAvailable: true
       });
       fetchMenuItems();
     } catch (error) {
-      toast.error('Failed to add menu item');
+      console.error('Error adding menu item:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to add menu item';
+      toast.error(errorMessage);
     }
   };
 
@@ -70,6 +88,7 @@ const Menu = () => {
       name: item.name,
       description: item.description || '',
       category: item.category,
+      section: item.section || 'both',
       price: item.price,
       cost: item.cost || '',
       isAvailable: item.isAvailable
@@ -80,7 +99,12 @@ const Menu = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/menu/${selectedItem.id}`, formData);
+      const payload = {
+        ...formData,
+        price: parseFloat(formData.price) || 0,
+        cost: formData.cost ? parseFloat(formData.cost) : null
+      };
+      await api.put(`/menu/${selectedItem.id}`, payload);
       toast.success('Menu item updated successfully');
       setShowEditModal(false);
       setSelectedItem(null);
@@ -88,13 +112,16 @@ const Menu = () => {
         name: '',
         description: '',
         category: '',
+        section: 'both',
         price: '',
         cost: '',
         isAvailable: true
       });
       fetchMenuItems();
     } catch (error) {
-      toast.error('Failed to update menu item');
+      console.error('Error updating menu item:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update menu item';
+      toast.error(errorMessage);
     }
   };
 
@@ -129,6 +156,13 @@ const Menu = () => {
     return <div className="text-center py-12">Loading menu...</div>;
   }
 
+  // Filter menu items by section
+  const filteredMenuItems = selectedSection === 'all'
+    ? menuItems
+    : menuItems.filter(item =>
+      item.section === selectedSection || item.section === 'both'
+    );
+
   return (
     <div>
       <div className="sm:flex sm:items-center sm:justify-between mb-6">
@@ -142,8 +176,41 @@ const Menu = () => {
         </button>
       </div>
 
+      {/* Section Filter */}
+      <div className="mb-6 flex justify-center">
+        <div className="inline-flex gap-2 bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => setSelectedSection('all')}
+            className={`px-6 py-2 rounded-md font-semibold transition-all ${selectedSection === 'all'
+                ? 'bg-white text-primary-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            All Items
+          </button>
+          <button
+            onClick={() => setSelectedSection('lodge-dine')}
+            className={`px-6 py-2 rounded-md font-semibold transition-all ${selectedSection === 'lodge-dine'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            🏨 Lodge-Dine
+          </button>
+          <button
+            onClick={() => setSelectedSection('cafe-restaurant')}
+            className={`px-6 py-2 rounded-md font-semibold transition-all ${selectedSection === 'cafe-restaurant'
+                ? 'bg-white text-green-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+              }`}
+          >
+            ☕ Cafe-Restaurant
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {menuItems.map((item) => (
+        {filteredMenuItems.map((item) => (
           <div key={item.id} className="bg-white overflow-hidden shadow rounded-lg">
             <div className="aspect-square bg-gray-100 overflow-hidden">
               {item.image ? (
@@ -242,6 +309,21 @@ const Menu = () => {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Section</label>
+                <select
+                  required
+                  value={formData.section}
+                  onChange={(e) => setFormData({ ...formData, section: e.target.value })}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                >
+                  {sections.map((sec) => (
+                    <option key={sec.value} value={sec.value}>
+                      {sec.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Price</label>
@@ -333,6 +415,21 @@ const Menu = () => {
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
                       {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Section</label>
+                <select
+                  required
+                  value={formData.section}
+                  onChange={(e) => setFormData({ ...formData, section: e.target.value })}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                >
+                  {sections.map((sec) => (
+                    <option key={sec.value} value={sec.value}>
+                      {sec.label}
                     </option>
                   ))}
                 </select>

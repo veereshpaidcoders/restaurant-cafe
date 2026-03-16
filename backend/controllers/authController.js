@@ -85,7 +85,8 @@ exports.login = async (req, res) => {
     logger.info('User logged in successfully', {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
+      section: user.section
     });
 
     res.json({
@@ -96,6 +97,7 @@ exports.login = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        section: user.section,
         token: generateToken(user.id)
       }
     });

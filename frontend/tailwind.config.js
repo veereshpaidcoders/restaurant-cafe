@@ -19,6 +19,23 @@ module.exports = {
           900: '#0c4a6e',
         },
       },
+      screens: {
+        'xs': '475px',      // Extra small devices (large phones)
+        'sm': '640px',      // Small devices (tablets)
+        'md': '768px',      // Medium devices (small laptops)
+        'lg': '1024px',     // Large devices (laptops/desktops)
+        'xl': '1280px',     // Extra large devices (large desktops)
+        '2xl': '1536px',    // 2X Extra large devices (larger desktops)
+        '3xl': '1920px',    // 3X Extra large devices (ultra-wide monitors)
+      },
+      spacing: {
+        '128': '32rem',
+        '144': '36rem',
+      },
+      maxWidth: {
+        '8xl': '88rem',
+        '9xl': '96rem',
+      },
     },
   },
   plugins: [],

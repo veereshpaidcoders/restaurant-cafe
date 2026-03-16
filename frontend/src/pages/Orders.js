@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 
 const Orders = () => {
+  const { user } = useSelector(state => state.auth);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [sectionFilter, setSectionFilter] = useState('all');
+
+  // Set initial section filter based on user's role and section
+  const getInitialSectionFilter = () => {
+    if (user?.role === 'captain' && user?.section) {
+      return user.section;
+    }
+    return 'all';
+  };
+
+  const [sectionFilter, setSectionFilter] = useState(getInitialSectionFilter());
+
+  // Update section filter when user changes
+  useEffect(() => {
+    if (user?.role === 'captain' && user?.section) {
+      setSectionFilter(user.section);
+    }
+  }, [user]);
 
   const fetchOrders = async () => {
     try {
@@ -63,7 +81,8 @@ const Orders = () => {
           <select
             value={sectionFilter}
             onChange={(e) => setSectionFilter(e.target.value)}
-            className="border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+            disabled={user?.role === 'captain'}
+            className="border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="all">All Sections</option>
             <option value="lodge-dine">🏨 Lodge-Dine</option>
@@ -112,8 +131,8 @@ const Orders = () => {
                         {order.section && (
                           <p className="mt-2 flex items-center text-sm sm:mt-0">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${order.section === 'lodge-dine'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-green-100 text-green-800'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-green-100 text-green-800'
                               }`}>
                               {order.section === 'lodge-dine' ? '🏨 Lodge-Dine' : '☕ Cafe-Restaurant'}
                             </span>
@@ -145,6 +164,75 @@ const Orders = () => {
                         ))}
                       </div>
                     </div>
+                    {/* Timeline Information */}
+                    {order.timeline && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-600">
+                          {/* Display timestamps */}
+                          {order.timeline.timestamps?.pending && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Ordered:</span>{' '}
+                              {new Date(order.timeline.timestamps.pending).toLocaleString()}
+                            </div>
+                          )}
+                          {order.timeline.timestamps?.confirmed && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Confirmed:</span>{' '}
+                              {new Date(order.timeline.timestamps.confirmed).toLocaleTimeString()}
+                            </div>
+                          )}
+                          {order.timeline.timestamps?.preparing && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Preparing:</span>{' '}
+                              {new Date(order.timeline.timestamps.preparing).toLocaleTimeString()}
+                            </div>
+                          )}
+                          {order.timeline.timestamps?.ready && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Ready:</span>{' '}
+                              {new Date(order.timeline.timestamps.ready).toLocaleTimeString()}
+                            </div>
+                          )}
+                          {order.timeline.timestamps?.served && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Served:</span>{' '}
+                              {new Date(order.timeline.timestamps.served).toLocaleTimeString()}
+                            </div>
+                          )}
+                          {order.timeline.timestamps?.completed && (
+                            <div>
+                              <span className="font-semibold text-gray-700">Completed:</span>{' '}
+                              {new Date(order.timeline.timestamps.completed).toLocaleTimeString()}
+                            </div>
+                          )}
+
+                          {/* Display durations */}
+                          {order.timeline.durations && Object.keys(order.timeline.durations).length > 0 && (
+                            <div className="w-full mt-2 pt-2 border-t border-gray-100">
+                              <span className="font-semibold text-gray-700">Durations: </span>
+                              {order.timeline.durations.pendingTime !== undefined && (
+                                <span className="mr-4">⏱️ Pending: {order.timeline.durations.pendingTime}m</span>
+                              )}
+                              {order.timeline.durations.confirmationTime !== undefined && (
+                                <span className="mr-4">📋 Confirming: {order.timeline.durations.confirmationTime}m</span>
+                              )}
+                              {order.timeline.durations.preparationTime !== undefined && (
+                                <span className="mr-4">👨‍🍳 Preparing: {order.timeline.durations.preparationTime}m</span>
+                              )}
+                              {order.timeline.durations.waitingTime !== undefined && (
+                                <span className="mr-4">⏰ Waiting: {order.timeline.durations.waitingTime}m</span>
+                              )}
+                              {order.timeline.durations.serviceTime !== undefined && (
+                                <span className="mr-4">✅ Service: {order.timeline.durations.serviceTime}m</span>
+                              )}
+                              {order.timeline.totalTime !== null && (
+                                <span className="font-bold text-primary-600">🕐 Total: {order.timeline.totalTime}m</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="ml-4 flex-shrink-0 flex gap-2">
                     {order.status === 'pending' && (

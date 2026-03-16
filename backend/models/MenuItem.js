@@ -18,6 +18,11 @@ const MenuItem = sequelize.define('MenuItem', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  section: {
+    type: DataTypes.ENUM('lodge-dine', 'cafe-restaurant', 'both'),
+    allowNull: true,
+    defaultValue: 'both'
+  },
   price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false

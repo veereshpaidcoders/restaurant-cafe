@@ -16,16 +16,19 @@ import Reservations from './pages/Reservations';
 import Customers from './pages/Customers';
 import Staff from './pages/Staff';
 import Reports from './pages/Reports';
+import Tables from './pages/Tables';
+import Rooms from './pages/Rooms';
+import Bookings from './pages/Bookings';
 import Layout from './components/Layout';
 
 // Private Route Component
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector(state => state.auth);
-  
+
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
-  
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -41,7 +44,7 @@ function App() {
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route path="/login" element={<Login />} />
-        
+
         <Route path="/" element={
           <PrivateRoute>
             <Layout />
@@ -50,12 +53,15 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="pos" element={<POS />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="tables" element={<Tables />} />
           <Route path="menu" element={<Menu />} />
           <Route path="inventory" element={<Inventory />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="customers" element={<Customers />} />
           <Route path="staff" element={<Staff />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="rooms" element={<Rooms />} />
+          <Route path="bookings" element={<Bookings />} />
         </Route>
       </Routes>
     </Router>

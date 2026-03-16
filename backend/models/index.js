@@ -7,6 +7,8 @@ const Schedule = require('./Schedule');
 const Table = require('./Table');
 const InventoryItem = require('./InventoryItem');
 const AuditLog = require('./AuditLog');
+const Room = require('./Room');
+const Booking = require('./Booking');
 
 // Define associations
 User.hasMany(Order, { foreignKey: 'userId', as: 'orders' });
@@ -24,6 +26,20 @@ Schedule.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 User.hasMany(AuditLog, { foreignKey: 'userId', as: 'auditLogs' });
 AuditLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
+// Table and Order associations
+Table.hasOne(Order, { foreignKey: 'id', sourceKey: 'currentOrderId', as: 'currentOrder' });
+Order.hasMany(Table, { foreignKey: 'currentOrderId', as: 'tables' });
+
+// Room and Booking associations
+Room.hasMany(Booking, { foreignKey: 'roomId', as: 'bookings' });
+Booking.belongsTo(Room, { foreignKey: 'roomId', as: 'room' });
+
+Customer.hasMany(Booking, { foreignKey: 'customerId', as: 'bookings' });
+Booking.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+User.hasMany(Booking, { foreignKey: 'createdBy', as: 'bookingsCreated' });
+Booking.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
+
 module.exports = {
   User,
   Order,
@@ -33,5 +49,7 @@ module.exports = {
   Schedule,
   Table,
   InventoryItem,
-  AuditLog
+  AuditLog,
+  Room,
+  Booking
 };

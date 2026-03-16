@@ -32,8 +32,13 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING
   },
   role: {
-    type: DataTypes.ENUM('admin', 'manager', 'cashier', 'waiter', 'chef', 'delivery'),
+    type: DataTypes.ENUM('admin', 'manager', 'cashier', 'waiter', 'chef', 'delivery', 'captain', 'supervisor'),
     defaultValue: 'waiter'
+  },
+  section: {
+    type: DataTypes.ENUM('lodge-dine', 'cafe-restaurant'),
+    allowNull: true,
+    comment: 'Section access for captains and section-specific roles'
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -69,7 +74,7 @@ const User = sequelize.define('User', {
   }
 });
 
-User.prototype.matchPassword = async function(enteredPassword) {
+User.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

@@ -16,6 +16,11 @@ const Order = sequelize.define('Order', {
     type: DataTypes.ENUM('dine-in', 'takeaway', 'delivery', 'online'),
     defaultValue: 'dine-in'
   },
+  section: {
+    type: DataTypes.ENUM('lodge-dine', 'cafe-restaurant'),
+    allowNull: true,
+    defaultValue: null
+  },
   status: {
     type: DataTypes.ENUM('pending', 'confirmed', 'preparing', 'ready', 'served', 'completed', 'cancelled'),
     defaultValue: 'pending'
@@ -76,6 +81,36 @@ const Order = sequelize.define('Order', {
   },
   completedAt: {
     type: DataTypes.DATE
+  },
+  // State timestamps - Track when order moves through each state
+  pendingAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: DataTypes.NOW
+  },
+  confirmedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  preparingAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  readyAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  servedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  completedAtTimestamp: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  cancelledAt: {
+    type: DataTypes.DATE,
+    allowNull: true
   },
   userId: {
     type: DataTypes.UUID,

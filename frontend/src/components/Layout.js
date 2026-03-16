@@ -15,19 +15,25 @@ import {
   ChartBarIcon,
   Bars3Icon,
   XMarkIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  TableCellsIcon,
+  HomeModernIcon,
+  CalendarDaysIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
   { name: 'POS', href: '/pos', icon: ShoppingCartIcon },
   { name: 'Orders', href: '/orders', icon: ClipboardDocumentListIcon },
+  { name: 'Tables', href: '/tables', icon: TableCellsIcon },
   { name: 'Menu', href: '/menu', icon: BookOpenIcon },
   { name: 'Inventory', href: '/inventory', icon: CubeIcon },
   { name: 'Reservations', href: '/reservations', icon: CalendarIcon },
   { name: 'Customers', href: '/customers', icon: UsersIcon },
   { name: 'Staff', href: '/staff', icon: UserGroupIcon },
-  { name: 'Reports', href: '/reports', icon: ChartBarIcon }
+  { name: 'Reports', href: '/reports', icon: ChartBarIcon },
+  { name: 'Rooms', href: '/rooms', icon: HomeModernIcon },
+  { name: 'Bookings', href: '/bookings', icon: CalendarDaysIcon }
 ];
 
 const Layout = () => {
@@ -36,6 +42,34 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector(state => state.auth);
+
+  // Filter navigation based on user role
+  const getFilteredNavigation = () => {
+    if (user?.role === 'captain') {
+      // Captains can only access POS, Orders, and Tables
+      return navigation.filter(item =>
+        item.name === 'POS' ||
+        item.name === 'Orders' ||
+        item.name === 'Tables'
+      );
+    }
+    if (user?.role === 'supervisor') {
+      // Supervisors can only access Orders, Inventory, and Staff
+      return navigation.filter(item =>
+        item.name === 'Orders' ||
+        item.name === 'Inventory' ||
+        item.name === 'Staff'
+      );
+    }
+    // Admin has access to all sections
+    // Rooms and Bookings are only visible to admin
+    if (user?.role !== 'admin') {
+      return navigation.filter(item => item.name !== 'Rooms' && item.name !== 'Bookings');
+    }
+    return navigation;
+  };
+
+  const filteredNavigation = getFilteredNavigation();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -86,17 +120,16 @@ const Layout = () => {
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
                       <li>
                         <ul role="list" className="-mx-2 space-y-1">
-                          {navigation.map((item) => {
+                          {filteredNavigation.map((item) => {
                             const isActive = location.pathname === item.href;
                             return (
                               <li key={item.name}>
                                 <Link
                                   to={item.href}
-                                  className={`${
-                                    isActive
-                                      ? 'bg-primary-50 text-primary-600'
-                                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                                  } group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold`}
+                                  className={`${isActive
+                                    ? 'bg-primary-50 text-primary-600'
+                                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                                    } group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold`}
                                 >
                                   <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
                                   {item.name}
@@ -128,17 +161,16 @@ const Layout = () => {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
-                  {navigation.map((item) => {
+                  {filteredNavigation.map((item) => {
                     const isActive = location.pathname === item.href;
                     return (
                       <li key={item.name}>
                         <Link
                           to={item.href}
-                          className={`${
-                            isActive
-                              ? 'bg-primary-50 text-primary-600'
-                              : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                          } group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold`}
+                          className={`${isActive
+                            ? 'bg-primary-50 text-primary-600'
+                            : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                            } group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold`}
                         >
                           <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
                           {item.name}
@@ -178,6 +210,16 @@ const Layout = () => {
                       <span className="text-sm font-semibold leading-6 text-gray-900">
                         {user?.firstName} {user?.lastName}
                       </span>
+                      {user?.role === 'captain' && user?.section && (
+                        <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+                          {user.section === 'lodge-dine' ? 'Lodge-Dine' : 'Cafe-Restaurant'}
+                        </span>
+                      )}
+                      {user?.role === 'supervisor' && (
+                        <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700">
+                          Supervisor
+                        </span>
+                      )}
                     </span>
                   </div>
                 </Menu.Button>
@@ -195,9 +237,8 @@ const Layout = () => {
                       {({ active }) => (
                         <button
                           onClick={handleLogout}
-                          className={`${
-                            active ? 'bg-gray-50' : ''
-                          } flex w-full items-center px-3 py-1 text-sm leading-6 text-gray-900`}
+                          className={`${active ? 'bg-gray-50' : ''
+                            } flex w-full items-center px-3 py-1 text-sm leading-6 text-gray-900`}
                         >
                           <ArrowRightOnRectangleIcon className="mr-2 h-5 w-5" />
                           Logout

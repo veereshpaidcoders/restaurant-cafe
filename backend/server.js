@@ -28,6 +28,9 @@ const reportRoutes = require('./routes/reportRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
 const auditRoutes = require('./routes/auditRoutes');
+const tableRoutes = require('./routes/tableRoutes');
+const roomRoutes = require('./routes/roomRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 // Import audit logger middleware
 const auditLogger = require('./middleware/auditLogger');
@@ -70,6 +73,9 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/tables', tableRoutes);
+app.use('/api/rooms', roomRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -126,9 +132,11 @@ const startServer = async () => {
     });
 
     // Sync database (use { force: false } in production)
-    logger.info('Synchronizing database models...');
-    await sequelize.sync({ alter: true });
-    logger.info('✓ Database synchronized');
+    // Note: Database already seeded, skipping sync to avoid ENUM alteration issues
+    // logger.info('Synchronizing database models...');
+    // await sequelize.sync({ force: false });
+    // logger.info('✓ Database synchronized');
+    logger.info('✓ Using existing database schema');
 
     // Start server
     server.listen(PORT, () => {
